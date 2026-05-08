@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="#000000"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="30dp">
+
+        <TextView
+            android:id="@+id/questionCounter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Вопрос 1 из 21"
+            android:textSize="16sp"
+            android:textColor="#FFE81F"
+            android:fontFamily="sans-serif"/>
+
+        <TextView
+            android:id="@+id/scoreText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Правильно: 0"
+            android:textSize="16sp"
+            android:textColor="#4CAF50"
+            android:fontFamily="sans-serif"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/questionText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Вопрос"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:lineSpacingExtra="4dp"
+        android:layout_marginBottom="40dp"/>
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp">
+
+        <RadioButton
+            android:id="@+id/option0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Вариант 1"
+            android:textColor="#FFFFFF"
+            android:padding="12dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"
+            android:background="#333333"
+            android:buttonTint="#FFE81F"/>
+
+        <RadioButton
+            android:id="@+id/option1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Вариант 2"
+            android:textColor="#FFFFFF"
+            android:padding="12dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"
+            android:background="#333333"
+            android:buttonTint="#FFE81F"/>
+
+        <RadioButton
+            android:id="@+id/option2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Вариант 3"
+            android:textColor="#FFFFFF"
+            android:padding="12dp"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"
+            android:background="#333333"
+            android:buttonTint="#FFE81F"/>
+
+        <RadioButton
+            android:id="@+id/option3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Вариант 4"
+            android:textColor="#FFFFFF"
+            android:padding="12dp"
+            android:textSize="16sp"
+            android:background="#333333"
+            android:buttonTint="#FFE81F"/>
+
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/prevButton"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:layout_weight="1"
+            android:text="◀ НАЗАД"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:backgroundTint="#FFE81F"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/nextButton"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:layout_weight="1"
+            android:text="ДАЛЕЕ ▶"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:backgroundTint="#FFE81F"/>
+
+    </LinearLayout>
+
+</LinearLayout>

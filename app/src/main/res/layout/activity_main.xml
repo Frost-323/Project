@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#000000"
+    android:padding="24dp">
+
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/star_wars_logo"
+        android:layout_marginBottom="40dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Star Wars"
+        android:textSize="42sp"
+        android:textStyle="bold"
+        android:textColor="#FFE81F"
+        android:fontFamily="sans-serif"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Викторина"
+        android:textSize="28sp"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="60dp"/>
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:text="НАЧАТЬ"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:backgroundTint="#FFE81F"
+        android:fontFamily="sans-serif-medium"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="© 2026 Star Wars Quiz"
+        android:textSize="12sp"
+        android:textColor="#666666"
+        android:layout_marginTop="60dp"/>
+
+    <Button
+        android:id="@+id/editBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Редактировать"
+        android:layout_marginTop="20dp"/>
+
+</LinearLayout>
