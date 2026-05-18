@@ -1,12 +1,10 @@
 package com.example.starwarsquiz;
 
-import android.content.Intent;
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-import android.graphics.Color;
-import android.util.Log;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +12,9 @@ import java.util.List;
 public class EditorActivity extends AppCompatActivity {
 
     private ListView listView;
+    private Button addButton, deleteButton, backButton;
     private ArrayAdapter<String> adapter;
-    private List<Question> questions = new ArrayList<>();
-    private File dataFile;
+    private List<Question> questionsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,164 +22,148 @@ public class EditorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_editor);
 
         listView = findViewById(R.id.listView);
-        Button addButton = findViewById(R.id.addButton);
-        Button deleteButton = findViewById(R.id.deleteButton);
+        addButton = findViewById(R.id.addButton);
+        deleteButton = findViewById(R.id.deleteButton);
+        backButton = findViewById(R.id.backToMainButton);
 
-        dataFile = new File(getFilesDir(), "questions.txt");
+        questionsList = loadQuestionsFromFile();
 
-        loadQuestions();
-        refreshList();
+        List<String> texts = new ArrayList<>();
+        for (Question q : questionsList) {
+            texts.add(q.getQuestionText());
+        }
+        adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_single_choice, texts);
+        listView.setAdapter(adapter);
+        listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-        listView.setOnItemClickListener((parent, view, position, id) -> showEditDialog(position));
+        addButton.setOnClickListener(v -> showEditDialog(null, -1));
+
+        deleteButton.setOnClickListener(v -> {
+            int pos = listView.getCheckedItemPosition();
+            if (pos != ListView.INVALID_POSITION) {
+                questionsList.remove(pos);
+                adapter.remove(adapter.getItem(pos));
+                adapter.notifyDataSetChanged();
+                listView.clearChoices();
+                saveQuestionsToFile();
+                Toast.makeText(this, "Удалено", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Выберите вопрос для удаления", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
-            showDeleteConfirmDialog(position);
+            showEditDialog(questionsList.get(position), position);
             return true;
         });
 
-        addButton.setOnClickListener(v -> showEditDialog(-1));
-        deleteButton.setOnClickListener(v -> showSelectQuestionToDeleteDialog());
-
-        Button backButton = findViewById(R.id.backToMainButton);
         backButton.setOnClickListener(v -> {
-            saveAllQuestions(); // СОХРАНЯЕМ ПРИ ВЫХОДЕ
-            Intent intent = new Intent(EditorActivity.this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+            saveQuestionsToFile();
             finish();
         });
     }
 
-    // АВТОСОХРАНЕНИЕ при любом уходе с экрана (назад, свайп, свернули приложение)
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (questions != null && !questions.isEmpty()) {
-            saveAllQuestions();
-            Log.d("EditorActivity", "Автосохранение в onPause, вопросов: " + questions.size());
-        }
-    }
-
-    private void showSelectQuestionToDeleteDialog() {
-        if (questions.isEmpty()) {
-            Toast.makeText(this, "Нет вопросов для удаления", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        String[] questionTitles = new String[questions.size()];
-        for (int i = 0; i < questions.size(); i++) {
-            questionTitles[i] = (i+1) + ". " + questions.get(i).getQuestionText();
-        }
-
+    private void showEditDialog(Question existing, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Выберите вопрос для удаления");
-        builder.setItems(questionTitles, (dialog, which) -> showDeleteConfirmDialog(which));
-        builder.setNegativeButton("Отмена", null);
-        builder.show();
-    }
+        builder.setTitle(existing == null ? "Новый вопрос" : "Редактирование");
 
-    private void showDeleteConfirmDialog(int position) {
-        new AlertDialog.Builder(this)
-                .setTitle("Удалить вопрос")
-                .setMessage("Удалить вопрос:\n" + questions.get(position).getQuestionText() + "?")
-                .setPositiveButton("Да", (dialog, which) -> {
-                    questions.remove(position);
-                    saveAllQuestions();
-                    refreshList();
-                })
-                .setNegativeButton("Нет", null)
-                .show();
-    }
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_question, null);
+        EditText qEdit = dialogView.findViewById(R.id.questionEditText);
+        EditText opt1 = dialogView.findViewById(R.id.option1EditText);
+        EditText opt2 = dialogView.findViewById(R.id.option2EditText);
+        EditText opt3 = dialogView.findViewById(R.id.option3EditText);
+        EditText opt4 = dialogView.findViewById(R.id.option4EditText);
+        RadioGroup radioGroup = dialogView.findViewById(R.id.radioGroup);
 
-    private void loadQuestions() {
-        questions.clear();
-        if (!dataFile.exists()) {
-            createAllQuestions();
-            saveAllQuestions();
-            return;
+        if (existing != null) {
+            qEdit.setText(existing.getQuestionText());
+            String[] opts = existing.getOptions();
+            opt1.setText(opts[0]);
+            opt2.setText(opts[1]);
+            opt3.setText(opts[2]);
+            opt4.setText(opts[3]);
+            ((RadioButton) radioGroup.getChildAt(existing.getCorrectAnswerIndex())).setChecked(true);
         }
-        try (BufferedReader reader = new BufferedReader(new FileReader(dataFile))) {
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
-            String content = sb.toString();
-            Log.d("EditorActivity", "Прочитан файл, длина: " + content.length());
 
-            if (content.startsWith("\uFEFF")) {
-                content = content.substring(1);
-            }
-            String[] blocks = content.split("---");
-            Log.d("EditorActivity", "Найдено блоков: " + blocks.length);
+        builder.setView(dialogView);
+        builder.setPositiveButton("Сохранить", null);
+        builder.setNegativeButton("Отмена", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
 
-            for (String block : blocks) {
-                if (block.trim().isEmpty()) continue;
-                Question q = parseBlock(block);
-                if (q != null) {
-                    questions.add(q);
-                    Log.d("EditorActivity", "Загружен вопрос: " + q.getQuestionText());
-                } else {
-                    Log.w("EditorActivity", "Не удалось распарсить блок:\n" + block);
-                }
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String qText = qEdit.getText().toString().trim();
+            String o1 = opt1.getText().toString().trim();
+            String o2 = opt2.getText().toString().trim();
+            String o3 = opt3.getText().toString().trim();
+            String o4 = opt4.getText().toString().trim();
+            int selectedId = radioGroup.getCheckedRadioButtonId();
+
+            if (qText.isEmpty() || o1.isEmpty() || o2.isEmpty() || o3.isEmpty() || o4.isEmpty() || selectedId == -1) {
+                Toast.makeText(this, "Заполните все поля и выберите правильный ответ", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            RadioButton checkedRadio = radioGroup.findViewById(selectedId);
+            int correctIndex = radioGroup.indexOfChild(checkedRadio);
+
+            String[] options = {o1, o2, o3, o4};
+
+            if (existing == null) {
+                questionsList.add(new Question(qText, options, correctIndex));
+                adapter.add(qText);
+            } else {
+                existing.setQuestionText(qText);
+                existing.setOptions(options);
+                existing.setCorrectAnswerIndex(correctIndex);
+                adapter.remove(adapter.getItem(position));
+                adapter.insert(qText, position);
+            }
+            adapter.notifyDataSetChanged();
+            saveQuestionsToFile();
+            Toast.makeText(this, "Сохранено", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+    }
+
+    private void saveQuestionsToFile() {
+        try (BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(openFileOutput("questions.txt", MODE_PRIVATE)))) {
+            for (Question q : questionsList) {
+                writer.write(q.toFileString());
+                writer.newLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Ошибка чтения файла", Toast.LENGTH_SHORT).show();
-        }
-
-        if (questions.isEmpty()) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Файл вопросов пуст или повреждён")
-                    .setMessage("Загрузить стандартные вопросы?")
-                    .setPositiveButton("Да", (dialog, which) -> {
-                        createAllQuestions();
-                        saveAllQuestions();
-                        refreshList();
-                    })
-                    .setNegativeButton("Нет", (dialog, which) -> {
-                        saveAllQuestions();
-                        refreshList();
-                    })
-                    .show();
+            Toast.makeText(this, "Ошибка сохранения", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private Question parseBlock(String block) {
-        String question = "";
-        String[] opts = new String[4];
-        int correct = -1;
-        String[] lines = block.split("\n");
-        for (String l : lines) {
-            l = l.trim();
-            if (l.isEmpty()) continue;
-            if (l.startsWith("ВОПРОС:")) {
-                question = l.substring(7).trim();
-            } else if (l.startsWith("ОТВЕТ A:")) {
-                opts[0] = l.substring(8).trim();
-            } else if (l.startsWith("ОТВЕТ B:")) {
-                opts[1] = l.substring(8).trim();
-            } else if (l.startsWith("ОТВЕТ C:")) {
-                opts[2] = l.substring(8).trim();
-            } else if (l.startsWith("ОТВЕТ D:")) {
-                opts[3] = l.substring(8).trim();
-            } else if (l.startsWith("ПРАВИЛЬНЫЙ ОТВЕТ:")) {
-                String c = l.substring(17).trim();
-                if (c.equals("A")) correct = 0;
-                else if (c.equals("B")) correct = 1;
-                else if (c.equals("C")) correct = 2;
-                else if (c.equals("D")) correct = 3;
+    private List<Question> loadQuestionsFromFile() {
+        List<Question> list = new ArrayList<>();
+        File file = new File(getFilesDir(), "questions.txt");
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(openFileInput("questions.txt")))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Question q = Question.fromFileString(line);
+                    if (q != null) list.add(q);
+                }
+            } catch (IOException e) {
+                Toast.makeText(this, "Ошибка загрузки", Toast.LENGTH_SHORT).show();
             }
         }
-        if (question.isEmpty() || opts[0] == null || opts[0].isEmpty() || correct == -1) {
-            Log.e("parseBlock", "Ошибка парсинга: вопрос=" + question + ", correct=" + correct);
-            return null;
+        if (list.isEmpty()) {
+            list = getDefaultQuestions();
+            saveQuestionsToFile();
         }
-        return new Question(question, opts, correct);
+        return list;
     }
 
-    private void createAllQuestions() {
-        questions.clear();
-        // 21 стандартный вопрос
+    // 21 вопрос (ваш список)
+    private List<Question> getDefaultQuestions() {
+        List<Question> questions = new ArrayList<>();
         questions.add(new Question("В какой момент Оби‑Ван Кеноби начинает использовать имя «Бен» и скрываться на Татуине?",
                 new String[]{"После битвы на Мустафаре", "После Приказа 66 и падения Республики", "Во время Войн клонов", "После дуэли с Дартом Молом"}, 1));
         questions.add(new Question("Какой световой меч использует Люк Скайуокер в конце фильма «Возвращение джедая»?",
@@ -224,144 +206,12 @@ public class EditorActivity extends AppCompatActivity {
                 new String[]{"Протокольный", "Астромеханик", "Боевой", "Разведчик"}, 1));
         questions.add(new Question("Какую должность занимал Лэндо на Беспине?",
                 new String[]{"Губернатор", "Барон-администратор", "Комендант", "Представитель"}, 1));
-
-        // 22-й вопрос про Звёздный Разрушитель
-        questions.add(new Question("Как называется самый известный тип имперского корабля, который часто называют просто «Разрушитель»?",
-                new String[]{"Звезда Смерти", "Звёздный Разрушитель", "Тысячелетний Сокол", "Исполнитель"}, 1));
+        return questions;
     }
 
-    private void saveAllQuestions() {
-        Log.d("EditorActivity", "Начинаем сохранение " + questions.size() + " вопросов");
-        try (FileWriter writer = new FileWriter(dataFile)) {
-            for (int i = 0; i < questions.size(); i++) {
-                Question q = questions.get(i);
-                writer.write("ВОПРОС: " + q.getQuestionText() + "\n");
-                writer.write("ОТВЕТ A: " + q.getOptions()[0] + "\n");
-                writer.write("ОТВЕТ B: " + q.getOptions()[1] + "\n");
-                writer.write("ОТВЕТ C: " + q.getOptions()[2] + "\n");
-                writer.write("ОТВЕТ D: " + q.getOptions()[3] + "\n");
-                String correctLetter = "";
-                switch (q.getCorrectAnswerIndex()) {
-                    case 0: correctLetter = "A"; break;
-                    case 1: correctLetter = "B"; break;
-                    case 2: correctLetter = "C"; break;
-                    case 3: correctLetter = "D"; break;
-                }
-                writer.write("ПРАВИЛЬНЫЙ ОТВЕТ: " + correctLetter + "\n");
-                writer.write("---\n");
-                writer.flush();
-            }
-            Log.d("EditorActivity", "Файл успешно записан");
-
-            // Диагностика - проверяем, что файл реально создался
-            if (dataFile.exists()) {
-                long fileSize = dataFile.length();
-                Toast.makeText(this, "✓ Сохранено! Всего вопросов: " + questions.size() + " (файл: " + fileSize + " байт)", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "ПРЕДУПРЕЖДЕНИЕ: Файл не создался!", Toast.LENGTH_LONG).show();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("EditorActivity", "Ошибка сохранения: " + e.getMessage());
-            Toast.makeText(this, "ОШИБКА сохранения: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void refreshList() {
-        List<String> display = new ArrayList<>();
-        for (int i = 0; i < questions.size(); i++) {
-            display.add((i+1) + ". " + questions.get(i).getQuestionText());
-        }
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, display);
-        listView.setAdapter(adapter);
-    }
-
-    private void showEditDialog(final int position) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(position == -1 ? "Новый вопрос" : "Редактировать");
-
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(40, 20, 40, 20);
-
-        final EditText questionInput = new EditText(this);
-        questionInput.setHint("Введите вопрос *");
-        final EditText[] answerInputs = new EditText[4];
-        for (int i = 0; i < 4; i++) {
-            answerInputs[i] = new EditText(this);
-            answerInputs[i].setHint("Ответ " + (char)('A'+i) + " *");
-        }
-
-        TextView hintCorrect = new TextView(this);
-        hintCorrect.setText("★ Выберите правильный ответ (обязательно) ★");
-        hintCorrect.setTextColor(Color.YELLOW);
-        hintCorrect.setTextSize(12);
-        hintCorrect.setPadding(0, 16, 0, 8);
-
-        final RadioGroup radioGroup = new RadioGroup(this);
-        radioGroup.setOrientation(RadioGroup.HORIZONTAL);
-        RadioButton rbA = new RadioButton(this); rbA.setText("A");
-        RadioButton rbB = new RadioButton(this); rbB.setText("B");
-        RadioButton rbC = new RadioButton(this); rbC.setText("C");
-        RadioButton rbD = new RadioButton(this); rbD.setText("D");
-        radioGroup.addView(rbA); radioGroup.addView(rbB); radioGroup.addView(rbC); radioGroup.addView(rbD);
-
-        if (position != -1) {
-            Question q = questions.get(position);
-            questionInput.setText(q.getQuestionText());
-            String[] opts = q.getOptions();
-            for (int i = 0; i < 4; i++) answerInputs[i].setText(opts[i]);
-            switch (q.getCorrectAnswerIndex()) {
-                case 0: rbA.setChecked(true); break;
-                case 1: rbB.setChecked(true); break;
-                case 2: rbC.setChecked(true); break;
-                case 3: rbD.setChecked(true); break;
-            }
-        }
-
-        layout.addView(questionInput);
-        for (EditText et : answerInputs) layout.addView(et);
-        layout.addView(hintCorrect);
-        layout.addView(radioGroup);
-        builder.setView(layout);
-
-        builder.setPositiveButton("Сохранить", (dialog, which) -> {
-            String qText = questionInput.getText().toString().trim();
-            String[] opts = new String[4];
-            for (int i = 0; i < 4; i++) opts[i] = answerInputs[i].getText().toString().trim();
-            int correctIdx = -1;
-            int checkedId = radioGroup.getCheckedRadioButtonId();
-            if (checkedId == rbA.getId()) correctIdx = 0;
-            else if (checkedId == rbB.getId()) correctIdx = 1;
-            else if (checkedId == rbC.getId()) correctIdx = 2;
-            else if (checkedId == rbD.getId()) correctIdx = 3;
-
-            if (qText.isEmpty()) {
-                Toast.makeText(this, "Введите текст вопроса", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            boolean hasEmptyOption = false;
-            for (int i = 0; i < 4; i++) {
-                if (opts[i].isEmpty()) {
-                    Toast.makeText(this, "Заполните ответ " + (char)('A'+i), Toast.LENGTH_SHORT).show();
-                    hasEmptyOption = true;
-                    break;
-                }
-            }
-            if (hasEmptyOption) return;
-            if (correctIdx == -1) {
-                Toast.makeText(this, "Выберите правильный ответ (A, B, C или D)", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            Question newQ = new Question(qText, opts, correctIdx);
-            if (position == -1) questions.add(newQ);
-            else questions.set(position, newQ);
-            saveAllQuestions();
-            refreshList();
-        });
-
-        builder.setNegativeButton("Отмена", null);
-        builder.show();
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveQuestionsToFile();
     }
 }

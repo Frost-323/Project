@@ -3,132 +3,141 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:background="#000000"
-    android:padding="20dp">
+    android:background="#0B0B0B"
+    android:gravity="center"
+    android:padding="24dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- Заголовок -->
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="30dp">
+        android:text="ИСПЫТАНИЕ СИЛЫ"
+        android:textColor="#FFD700"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:letterSpacing="0.15"
+        android:fontFamily="sans-serif-condensed"
+        android:layout_marginBottom="16dp"/>
 
-        <TextView
-            android:id="@+id/questionCounter"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Вопрос 1 из 21"
-            android:textSize="16sp"
-            android:textColor="#FFE81F"
-            android:fontFamily="sans-serif"/>
+    <!-- Разделитель -->
+    <View
+        android:layout_width="120dp"
+        android:layout_height="2dp"
+        android:background="#FFD700"
+        android:layout_marginBottom="16dp"/>
 
-        <TextView
-            android:id="@+id/scoreText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Правильно: 0"
-            android:textSize="16sp"
-            android:textColor="#4CAF50"
-            android:fontFamily="sans-serif"/>
-
-    </LinearLayout>
-
+    <!-- Текст вопроса -->
     <TextView
         android:id="@+id/questionText"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Вопрос"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:text="Вопрос появится здесь"
         android:textColor="#FFFFFF"
+        android:textSize="18sp"
         android:gravity="center"
-        android:lineSpacingExtra="4dp"
-        android:layout_marginBottom="40dp"/>
+        android:lineSpacingMultiplier="1.2"
+        android:layout_marginBottom="24dp"/>
 
+    <!-- Варианты ответов -->
     <RadioGroup
         android:id="@+id/radioGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp">
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="24dp">
 
         <RadioButton
-            android:id="@+id/option0"
+            android:id="@+id/radio1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Вариант 1"
+            android:text="Ответ 1"
             android:textColor="#FFFFFF"
+            android:buttonTint="#FFD700"
             android:padding="12dp"
-            android:textSize="16sp"
             android:layout_marginBottom="8dp"
-            android:background="#333333"
-            android:buttonTint="#FFE81F"/>
+            android:background="@drawable/radio_bg"
+            android:gravity="center"/>
 
         <RadioButton
-            android:id="@+id/option1"
+            android:id="@+id/radio2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Вариант 2"
+            android:text="Ответ 2"
             android:textColor="#FFFFFF"
+            android:buttonTint="#FFD700"
             android:padding="12dp"
-            android:textSize="16sp"
             android:layout_marginBottom="8dp"
-            android:background="#333333"
-            android:buttonTint="#FFE81F"/>
+            android:background="@drawable/radio_bg"
+            android:gravity="center"/>
 
         <RadioButton
-            android:id="@+id/option2"
+            android:id="@+id/radio3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Вариант 3"
+            android:text="Ответ 3"
             android:textColor="#FFFFFF"
+            android:buttonTint="#FFD700"
             android:padding="12dp"
-            android:textSize="16sp"
             android:layout_marginBottom="8dp"
-            android:background="#333333"
-            android:buttonTint="#FFE81F"/>
+            android:background="@drawable/radio_bg"
+            android:gravity="center"/>
 
         <RadioButton
-            android:id="@+id/option3"
+            android:id="@+id/radio4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Вариант 4"
+            android:text="Ответ 4"
             android:textColor="#FFFFFF"
+            android:buttonTint="#FFD700"
             android:padding="12dp"
-            android:textSize="16sp"
-            android:background="#333333"
-            android:buttonTint="#FFE81F"/>
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/radio_bg"
+            android:gravity="center"/>
 
     </RadioGroup>
 
+    <!-- Блок кнопок навигации -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
 
         <Button
-            android:id="@+id/prevButton"
+            android:id="@+id/backButton"
             android:layout_width="0dp"
-            android:layout_height="55dp"
+            android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="◀ НАЗАД"
-            android:textSize="14sp"
+            android:text="НАЗАД"
+            android:textColor="#FFD700"
+            android:background="@drawable/button_outline_bg"
             android:textStyle="bold"
-            android:textColor="#000000"
-            android:backgroundTint="#FFE81F"
             android:layout_marginEnd="8dp"/>
 
         <Button
-            android:id="@+id/nextButton"
+            android:id="@+id/exitButton"
             android:layout_width="0dp"
-            android:layout_height="55dp"
+            android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="ДАЛЕЕ ▶"
-            android:textSize="14sp"
+            android:text="ВЫЙТИ"
+            android:textColor="#FFD700"
+            android:background="@drawable/button_outline_bg"
             android:textStyle="bold"
-            android:textColor="#000000"
-            android:backgroundTint="#FFE81F"/>
-
+            android:layout_marginStart="8dp"/>
     </LinearLayout>
+
+    <!-- Кнопка «ОТВЕТИТЬ» -->
+    <Button
+        android:id="@+id/nextButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="ОТВЕТИТЬ"
+        android:backgroundTint="#FFD700"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:elevation="4dp"/>
 
 </LinearLayout>

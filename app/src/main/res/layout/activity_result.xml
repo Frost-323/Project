@@ -3,71 +3,73 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#0B0B0B"
     android:gravity="center"
-    android:background="#000000"
-    android:padding="24dp">
+    android:padding="32dp"
+    android:paddingTop="60dp">
 
+    <!-- Заголовок -->
     <TextView
-        android:id="@+id/resultTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="РЕЗУЛЬТАТ"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:textColor="#FFE81F"
-        android:layout_marginBottom="30dp"/>
-
-    <TextView
-        android:id="@+id/resultMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="22sp"
-        android:textColor="#FFFFFF"
+        android:text="ИСПЫТАНИЕ ЗАВЕРШЕНО"
+        android:textColor="#FFD700"
+        android:textSize="28sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginBottom="20dp"/>
-
-    <TextView
-        android:id="@+id/resultQuote"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="18sp"
-        android:textColor="#FFE81F"
-        android:gravity="center"
-        android:lineSpacingExtra="6dp"
-        android:layout_marginBottom="40dp"/>
-
-    <TextView
-        android:id="@+id/scoreDisplay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="10 / 21"
-        android:textSize="36sp"
-        android:textStyle="bold"
-        android:textColor="#4CAF50"
-        android:layout_marginBottom="40dp"/>
-
-    <Button
-        android:id="@+id/restartButton"
-        android:layout_width="200dp"
-        android:layout_height="55dp"
-        android:text="ПРОЙТИ СНОВА"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:backgroundTint="#FFE81F"
+        android:letterSpacing="0.1"
+        android:fontFamily="sans-serif-condensed"
         android:layout_marginBottom="16dp"/>
 
-    <Button
-        android:id="@+id/exitButton"
-        android:layout_width="200dp"
-        android:layout_height="55dp"
-        android:text="ВЫЙТИ"
-        android:textSize="14sp"
+    <!-- Разделитель -->
+    <View
+        android:layout_width="120dp"
+        android:layout_height="3dp"
+        android:background="#FFD700"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Иконка или символ (можно заменить на свою) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="✦"
+        android:textColor="#FFD700"
+        android:textSize="48sp"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Крупная цифра результата -->
+    <TextView
+        android:id="@+id/resultText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0/21"
+        android:textColor="#FFD700"
+        android:textSize="56sp"
         android:textStyle="bold"
-        android:textColor="#FFE81F"
-        android:backgroundTint="#333333"/>
+        android:fontFamily="sans-serif-condensed"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Сообщение -->
+    <TextView
+        android:id="@+id/messageText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Сила с тобой."
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:gravity="center"
+        android:lineSpacingExtra="8dp"
+        android:layout_marginBottom="48dp"/>
+
+    <!-- Кнопка возврата -->
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="200dp"
+        android:layout_height="56dp"
+        android:text="НА ГЛАВНУЮ"
+        android:backgroundTint="#FFD700"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:elevation="4dp"/>
 
 </LinearLayout>

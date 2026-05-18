@@ -5,54 +5,57 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import java.util.Random;
 
 public class ResultActivity extends AppCompatActivity {
-
-    private TextView resultMessage, resultQuote, scoreDisplay;
-    private Button restartButton, exitButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
 
-        resultMessage = findViewById(R.id.resultMessage);
-        resultQuote = findViewById(R.id.resultQuote);
-        scoreDisplay = findViewById(R.id.scoreDisplay);
-        restartButton = findViewById(R.id.restartButton);
-        exitButton = findViewById(R.id.exitButton);
+        TextView resultText = findViewById(R.id.resultText);
+        TextView messageText = findViewById(R.id.messageText);
+        Button backButton = findViewById(R.id.backButton);
 
-        int totalScore = getIntent().getIntExtra("totalScore", 0);
-        int totalQuestions = getIntent().getIntExtra("totalQuestions", 21);
-        int percentage = (totalScore * 100) / totalQuestions;
+        int correct = getIntent().getIntExtra("correct", 0);
+        int total = getIntent().getIntExtra("total", 0);
 
-        scoreDisplay.setText(totalScore + " / " + totalQuestions);
+        resultText.setText(correct + " / " + total);
 
-        if (percentage >= 70) {
-            resultMessage.setText("★ ПОЗДРАВЛЯЮ! ★");
-            resultQuote.setText("«Да пребудет с тобой Сила»\n- Оби-Ван Кеноби");
-            scoreDisplay.setTextColor(getColor(android.R.color.holo_green_dark));
-        } else if (percentage >= 40) {
-            resultMessage.setText("НЕПЛОХО, НО МОЖНО ЛУЧШЕ");
-            resultQuote.setText("«Тренироваться надо, юный падаван»\n- Йода");
-            scoreDisplay.setTextColor(getColor(android.R.color.holo_orange_dark));
-        } else {
-            resultMessage.setText("ПОРАЖЕНИЕ НА ТЁМНОЙ СТОРОНЕ");
-            resultQuote.setText("«Ты был избранником! Ты должен был уничтожить ситхов, а не примкнуть к ним!»\n- Оби-Ван Кеноби");
-            scoreDisplay.setTextColor(getColor(android.R.color.holo_red_dark));
+        // Выбираем сообщение в зависимости от результата
+        String message = getMotivationalMessage(correct, total);
+        messageText.setText(message);
+
+        backButton.setOnClickListener(v -> {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+        });
+    }
+
+    private String getMotivationalMessage(int correct, int total) {
+        double percent = (double) correct / total;
+        Random random = new Random();
+
+        if (percent < 0.4) {                    // 0–8 баллов из 21
+            String[] phrases = {
+                    "Даже Оби-Ван не всегда побеждал. Тренируйся, юный падаван!",
+                    "Энакин тоже ошибался. Не переходи на тёмную сторону, попробуй ещё раз."
+            };
+            return phrases[random.nextInt(phrases.length)];
+        } else if (percent < 0.7) {            // 9–14 баллов
+            String[] phrases = {
+                    "Сила ещё растёт в тебе. Продолжай обучение, и станешь рыцарем.",
+                    "Ты на верном пути, словно Люк на Дагобе. Не останавливайся!"
+            };
+            return phrases[random.nextInt(phrases.length)];
+        } else {                               // 15–21 балл
+            String[] phrases = {
+                    "Великий джедай! Твоя мудрость достойна совета магистров.",
+                    "Магистр Йода гордился бы тобой. Истинный хранитель мира!",
+                    "Светлая сторона выбрала тебя. Ты — надежда галактики!"
+            };
+            return phrases[random.nextInt(phrases.length)];
         }
-
-        restartButton.setOnClickListener(v -> {
-            Intent intent = new Intent(ResultActivity.this, QuizActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
-        exitButton.setOnClickListener(v -> {
-            Intent intent = new Intent(ResultActivity.this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        });
     }
 }

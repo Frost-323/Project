@@ -6,16 +6,20 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Button startButton = findViewById(R.id.startButton);
-        startButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, QuizActivity.class)));
+        Button editBtn = findViewById(R.id.editBtn);
 
-        Button editButton = findViewById(R.id.editBtn);
-        editButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, EditorActivity.class)));
+        // Запуск викторины
+        startButton.setOnClickListener(v ->
+                startActivity(new Intent(this, QuizActivity.class)));
+
+        // Запуск редактора
+        editBtn.setOnClickListener(v ->
+                startActivity(new Intent(this, EditorActivity.class)));
     }
 }

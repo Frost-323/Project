@@ -10,96 +10,118 @@ import java.util.List;
 
 public class QuizActivity extends AppCompatActivity {
 
-    private TextView questionCounter, questionText, scoreText;
-    private RadioGroup radioGroup;
-    private RadioButton[] optionButtons = new RadioButton[4];
-    private Button prevButton, nextButton;
-
     private List<Question> questions;
     private int currentQuestionIndex = 0;
-    private int[] userAnswers;
-    private int score = 0;
-    private File dataFile;
+    private int correctAnswers = 0;
+
+    private TextView questionText;
+    private RadioGroup radioGroup;
+    private RadioButton radio1, radio2, radio3, radio4;
+    private Button nextButton, backButton, exitButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
 
-        initializeViews();
-        dataFile = new File(getFilesDir(), "questions.txt");
+        questionText = findViewById(R.id.questionText);
+        radioGroup = findViewById(R.id.radioGroup);
+        radio1 = findViewById(R.id.radio1);
+        radio2 = findViewById(R.id.radio2);
+        radio3 = findViewById(R.id.radio3);
+        radio4 = findViewById(R.id.radio4);
+        nextButton = findViewById(R.id.nextButton);
+        backButton = findViewById(R.id.backButton);
+        exitButton = findViewById(R.id.exitButton);
 
-        loadQuestionsFromFile();
-
-        // НОВАЯ ПРОВЕРКА
-        if (questions == null || questions.size() != 21) {
-            loadDefaultQuestions();
-            saveQuestionsToFile();
+        questions = loadQuestionsFromFile();
+        if (questions.isEmpty()) {
+            Toast.makeText(this, "Нет вопросов!", Toast.LENGTH_LONG).show();
+            finish();
+            return;
         }
-
-        userAnswers = new int[questions.size()];
-        for (int i = 0; i < userAnswers.length; i++) userAnswers[i] = -1;
 
         displayQuestion(currentQuestionIndex);
-        setupListeners();
+
+        // Кнопка "ОТВЕТИТЬ"
+        nextButton.setOnClickListener(v -> {
+            int selectedId = radioGroup.getCheckedRadioButtonId();
+            if (selectedId == -1) {
+                Toast.makeText(this, "Выберите ответ!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            RadioButton selectedRadio = findViewById(selectedId);
+            int answerIndex = radioGroup.indexOfChild(selectedRadio);
+            if (answerIndex == questions.get(currentQuestionIndex).getCorrectAnswerIndex()) {
+                correctAnswers++;
+            }
+
+            if (currentQuestionIndex < questions.size() - 1) {
+                currentQuestionIndex++;
+                displayQuestion(currentQuestionIndex);
+                radioGroup.clearCheck();
+            } else {
+                // Викторина завершена
+                Intent intent = new Intent(QuizActivity.this, ResultActivity.class);
+                intent.putExtra("correct", correctAnswers);
+                intent.putExtra("total", questions.size());
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        // Кнопка "НАЗАД"
+        backButton.setOnClickListener(v -> {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion(currentQuestionIndex);
+                radioGroup.clearCheck();
+            } else {
+                Toast.makeText(this, "Это первый вопрос", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Кнопка "ВЫЙТИ"
+        exitButton.setOnClickListener(v -> {
+            // Просто возвращаемся на главный экран
+            startActivity(new Intent(QuizActivity.this, MainActivity.class));
+            finish();
+        });
     }
 
-    private void initializeViews() {
-        questionCounter = findViewById(R.id.questionCounter);
-        questionText = findViewById(R.id.questionText);
-        scoreText = findViewById(R.id.scoreText);
-        radioGroup = findViewById(R.id.radioGroup);
-        optionButtons[0] = findViewById(R.id.option0);
-        optionButtons[1] = findViewById(R.id.option1);
-        optionButtons[2] = findViewById(R.id.option2);
-        optionButtons[3] = findViewById(R.id.option3);
-        prevButton = findViewById(R.id.prevButton);
-        nextButton = findViewById(R.id.nextButton);
+    private void displayQuestion(int index) {
+        Question q = questions.get(index);
+        questionText.setText(q.getQuestionText());
+        String[] options = q.getOptions();
+        radio1.setText(options[0]);
+        radio2.setText(options[1]);
+        radio3.setText(options[2]);
+        radio4.setText(options[3]);
     }
 
-    private void loadQuestionsFromFile() {
-        questions = new ArrayList<>();
-        if (!dataFile.exists()) return;
-        try (BufferedReader reader = new BufferedReader(new FileReader(dataFile))) {
-            StringBuilder sb = new StringBuilder();
+    private List<Question> loadQuestionsFromFile() {
+        List<Question> list = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(openFileInput("questions.txt")))) {
             String line;
-            while ((line = reader.readLine()) != null) sb.append(line).append("\n");
-            String[] blocks = sb.toString().split("---");
-            for (String block : blocks) {
-                if (block.trim().isEmpty()) continue;
-                Question q = parseBlock(block);
-                if (q != null) questions.add(q);
+            while ((line = reader.readLine()) != null) {
+                Question q = Question.fromFileString(line);
+                if (q != null) list.add(q);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            list = getDefaultQuestions();
+            saveDefaultQuestions(list);
         }
+        if (list.isEmpty()) {
+            list = getDefaultQuestions();
+        }
+        return list;
     }
 
-    private Question parseBlock(String block) {
-        String question = "";
-        String[] opts = new String[4];
-        int correct = -1;
-        String[] lines = block.split("\n");
-        for (String l : lines) {
-            if (l.startsWith("ВОПРОС:")) question = l.substring(7).trim();
-            else if (l.startsWith("ОТВЕТ A:")) opts[0] = l.substring(8).trim();
-            else if (l.startsWith("ОТВЕТ B:")) opts[1] = l.substring(8).trim();
-            else if (l.startsWith("ОТВЕТ C:")) opts[2] = l.substring(8).trim();
-            else if (l.startsWith("ОТВЕТ D:")) opts[3] = l.substring(8).trim();
-            else if (l.startsWith("ПРАВИЛЬНЫЙ ОТВЕТ:")) {
-                String c = l.substring(17).trim();
-                if (c.equals("A")) correct = 0;
-                else if (c.equals("B")) correct = 1;
-                else if (c.equals("C")) correct = 2;
-                else if (c.equals("D")) correct = 3;
-            }
-        }
-        if (question.isEmpty() || opts[0] == null || correct == -1) return null;
-        return new Question(question, opts, correct);
-    }
-
-    private void loadDefaultQuestions() {
-        questions = new ArrayList<>();
+    // 21 вопрос (ваш список)
+    private List<Question> getDefaultQuestions() {
+        List<Question> questions = new ArrayList<>();
         questions.add(new Question("В какой момент Оби‑Ван Кеноби начинает использовать имя «Бен» и скрываться на Татуине?",
                 new String[]{"После битвы на Мустафаре", "После Приказа 66 и падения Республики", "Во время Войн клонов", "После дуэли с Дартом Молом"}, 1));
         questions.add(new Question("Какой световой меч использует Люк Скайуокер в конце фильма «Возвращение джедая»?",
@@ -142,96 +164,18 @@ public class QuizActivity extends AppCompatActivity {
                 new String[]{"Протокольный", "Астромеханик", "Боевой", "Разведчик"}, 1));
         questions.add(new Question("Какую должность занимал Лэндо на Беспине?",
                 new String[]{"Губернатор", "Барон-администратор", "Комендант", "Представитель"}, 1));
+        return questions;
     }
 
-    private void saveQuestionsToFile() {
-        try (FileWriter writer = new FileWriter(dataFile)) {
+    private void saveDefaultQuestions(List<Question> questions) {
+        try (BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(openFileOutput("questions.txt", MODE_PRIVATE)))) {
             for (Question q : questions) {
-                writer.write("ВОПРОС: " + q.getQuestionText() + "\n");
-                writer.write("ОТВЕТ A: " + q.getOptions()[0] + "\n");
-                writer.write("ОТВЕТ B: " + q.getOptions()[1] + "\n");
-                writer.write("ОТВЕТ C: " + q.getOptions()[2] + "\n");
-                writer.write("ОТВЕТ D: " + q.getOptions()[3] + "\n");
-                String correctLetter = "";
-                switch (q.getCorrectAnswerIndex()) {
-                    case 0: correctLetter = "A"; break;
-                    case 1: correctLetter = "B"; break;
-                    case 2: correctLetter = "C"; break;
-                    case 3: correctLetter = "D"; break;
-                }
-                writer.write("ПРАВИЛЬНЫЙ ОТВЕТ: " + correctLetter + "\n");
-                writer.write("---\n");
+                writer.write(q.toFileString());
+                writer.newLine();
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    private void displayQuestion(int index) {
-        Question q = questions.get(index);
-        questionText.setText(q.getQuestionText());
-        questionCounter.setText("Вопрос " + (index + 1) + " из " + questions.size());
-
-        String[] options = q.getOptions();
-        for (int i = 0; i < optionButtons.length; i++) {
-            optionButtons[i].setText(options[i]);
-        }
-
-        radioGroup.clearCheck();
-        if (userAnswers[index] != -1) {
-            optionButtons[userAnswers[index]].setChecked(true);
-        }
-
-        prevButton.setEnabled(index > 0);
-
-        if (index == questions.size() - 1) {
-            nextButton.setText("ЗАВЕРШИТЬ");
-        } else {
-            nextButton.setText("ДАЛЕЕ ▶");
-        }
-    }
-
-    private void setupListeners() {
-        prevButton.setOnClickListener(v -> {
-            saveCurrentAnswer();
-            currentQuestionIndex--;
-            displayQuestion(currentQuestionIndex);
-        });
-
-        nextButton.setOnClickListener(v -> {
-            saveCurrentAnswer();
-            if (currentQuestionIndex == questions.size() - 1) {
-                calculateFinalScore();
-                Intent intent = new Intent(QuizActivity.this, ResultActivity.class);
-                intent.putExtra("totalScore", score);
-                intent.putExtra("totalQuestions", questions.size());
-                startActivity(intent);
-                finish();
-            } else {
-                currentQuestionIndex++;
-                displayQuestion(currentQuestionIndex);
-            }
-        });
-    }
-
-    private void saveCurrentAnswer() {
-        int selectedId = radioGroup.getCheckedRadioButtonId();
-        if (selectedId != -1) {
-            for (int i = 0; i < optionButtons.length; i++) {
-                if (optionButtons[i].getId() == selectedId) {
-                    userAnswers[currentQuestionIndex] = i;
-                    break;
-                }
-            }
-        }
-    }
-
-    private void calculateFinalScore() {
-        score = 0;
-        for (int i = 0; i < questions.size(); i++) {
-            if (userAnswers[i] != -1 && questions.get(i).isCorrect(userAnswers[i])) {
-                score++;
-            }
         }
     }
 }

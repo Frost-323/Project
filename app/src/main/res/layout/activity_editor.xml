@@ -3,69 +3,93 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#000000"
-    android:padding="8dp">
+    android:background="#0B0B0B"
+    android:padding="16dp">
 
+    <!-- Заголовок "РЕДАКТОР ВОПРОСОВ" -->
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="РЕДАКТОР ВОПРОСОВ"
+        android:text="АРХИВЫ ДЖЕДАЕВ"
+        android:textColor="#FFD700"
         android:textSize="22sp"
         android:textStyle="bold"
-        android:textColor="#FFE81F"
-        android:layout_margin="16dp"
-        android:layout_gravity="center" />
+        android:gravity="center"
+        android:letterSpacing="0.15"
+        android:fontFamily="sans-serif-condensed"
+        android:layout_marginBottom="16dp"/>
 
+    <!-- Линия-разделитель цвета светового меча -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#FFD700"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Горизонтальный блок кнопок -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+
+        <Button
+            android:id="@+id/addButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="ДОБАВИТЬ"
+            android:backgroundTint="#FFD700"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:layout_marginEnd="8dp"
+            android:elevation="4dp"/>
+
+        <Button
+            android:id="@+id/deleteButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="УДАЛИТЬ"
+            android:backgroundTint="#FFD700"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:layout_marginEnd="8dp"
+            android:elevation="4dp"/>
+
+        <Button
+            android:id="@+id/backToMainButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="НАЗАД"
+            android:backgroundTint="#FFD700"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:elevation="4dp"/>
+    </LinearLayout>
+
+    <!-- Список вопросов (с тёмным оформлением) -->
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:divider="#333333"
-        android:dividerHeight="1dp" />
+        android:background="#1A1A1A"
+        android:cacheColorHint="#00000000"
+        android:divider="#FFD700"
+        android:dividerHeight="1dp"
+        android:padding="8dp"
+        android:textColor="#FFFFFF"
+        android:choiceMode="singleChoice"/>
 
-    <LinearLayout
+    <!-- Текст-подсказка внизу -->
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="16dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp">
-
-        <Button
-            android:id="@+id/addButton"
-            android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:layout_weight="1"
-            android:text="+ ДОБАВИТЬ"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:backgroundTint="#1AFF00"
-            android:layout_marginEnd="8dp" />
-
-        <Button
-            android:id="@+id/deleteButton"
-            android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:layout_weight="1"
-            android:text="✖ УДАЛИТЬ"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:backgroundTint="#FF4444"
-            android:layout_marginStart="8dp" />
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/backToMainButton"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="НА ГЛАВНЫЙ ЭКРАН"
-        android:textSize="14sp"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:backgroundTint="#FFE81F"
-        android:layout_margin="16dp" />
-
+        android:text="Долгое нажатие — редактировать вопрос"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:layout_marginTop="8dp"/>
 </LinearLayout>

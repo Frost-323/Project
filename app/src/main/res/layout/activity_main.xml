@@ -4,58 +4,87 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="#000000"
+    android:background="#0B0B0B"
     android:padding="24dp">
 
+    <!-- Логотип (если есть файл @drawable/star_wars_logo, иначе замените на TextView с символом) -->
     <ImageView
         android:id="@+id/logoImage"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
         android:src="@drawable/star_wars_logo"
-        android:layout_marginBottom="40dp"/>
+        android:contentDescription="Star Wars Logo"
+        android:layout_marginBottom="32dp"/>
 
+    <!-- Главный заголовок -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Star Wars"
-        android:textSize="42sp"
+        android:text="STAR WARS"
+        android:textSize="48sp"
         android:textStyle="bold"
         android:textColor="#FFE81F"
-        android:fontFamily="sans-serif"
-        android:layout_marginBottom="16dp"/>
+        android:fontFamily="sans-serif-black"
+        android:letterSpacing="0.15"
+        android:shadowColor="#FFE81F"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="12"
+        android:layout_marginBottom="8dp"/>
 
+    <!-- Подзаголовок -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Викторина"
-        android:textSize="28sp"
+        android:text="ВИКТОРИНА"
+        android:textSize="22sp"
         android:textColor="#FFFFFF"
-        android:layout_marginBottom="60dp"/>
+        android:letterSpacing="0.3"
+        android:fontFamily="sans-serif-light"
+        android:layout_marginBottom="48dp"/>
 
+    <!-- Декоративная золотая линия -->
+    <View
+        android:layout_width="120dp"
+        android:layout_height="2dp"
+        android:background="#FFE81F"
+        android:layout_marginBottom="48dp"/>
+
+    <!-- Кнопка НАЧАТЬ -->
     <Button
         android:id="@+id/startButton"
-        android:layout_width="200dp"
-        android:layout_height="60dp"
-        android:text="НАЧАТЬ"
+        android:layout_width="240dp"
+        android:layout_height="64dp"
+        android:text="НАЧАТЬ ИГРУ"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="#000000"
-        android:backgroundTint="#FFE81F"
-        android:fontFamily="sans-serif-medium"/>
+        android:background="@drawable/button_gold_bg"
+        android:elevation="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:stateListAnimator="@null"/>
 
+    <!-- Кнопка РЕДАКТИРОВАТЬ -->
+    <Button
+        android:id="@+id/editBtn"
+        android:layout_width="240dp"
+        android:layout_height="56dp"
+        android:text="РЕДАКТИРОВАТЬ ВОПРОСЫ"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#FFE81F"
+        android:background="@drawable/button_outline_bg"
+        android:elevation="4dp"
+        android:layout_marginTop="24dp"
+        android:stateListAnimator="@null"/>
+
+    <!-- Копирайт -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="© 2026 Star Wars Quiz"
         android:textSize="12sp"
-        android:textColor="#666666"
-        android:layout_marginTop="60dp"/>
-
-    <Button
-        android:id="@+id/editBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Редактировать"
-        android:layout_marginTop="20dp"/>
+        android:textColor="#555555"
+        android:layout_marginTop="72dp"/>
 
 </LinearLayout>
